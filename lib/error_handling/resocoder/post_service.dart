@@ -7,7 +7,7 @@ class FakeHttpClient {
   Future<String> getResponseBody() async {
     await Future.delayed(Duration(milliseconds: 500));
     //! No Internet Connection
-    // throw SocketException('No Internet');
+    //throw SocketException('No Internet');
     //! 404
     // throw HttpException('404');
     //! Invalid JSON (throws FormatException)
@@ -24,10 +24,28 @@ class PostService {
     try {
       final responseBody = await httpClient.getResponseBody();
       return Post.fromJson(responseBody);
-    } catch (e) {
-      print(e);
+    } on SocketException {
+      throw Failure("Socket Exception no internet connetion");
+      rethrow;
+      print("Socket Exception no internet connetion");
+    } on HttpException {
+      throw Failure("HttpException: Coundly fing the httpp response");
+      //rethrow;
+      print("HttpException: Coundly fing the httpp response");
+    } on FormatException {
+      throw Failure("FormatExceprtion: Bad format of Json received");
+      //rethrow;
+      print("FormatExceprtion: Bad format of Json received");
     }
   }
+}
+
+class Failure {
+  final String message;
+  Failure(this.message);
+
+  @override
+  String toString() => message;
 }
 
 class Post {

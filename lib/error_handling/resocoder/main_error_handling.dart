@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'post_service.dart';
+import 'package:new_concepts/error_handling/resocoder/post_change_notifier.dart';
+import 'package:provider/provider.dart';
 
 //void main() => runApp(MyApp());
 
@@ -9,7 +9,8 @@ class ErrorHandlingResoCoder extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Material App',
-      home: Home(),
+      home: ChangeNotifierProvider(
+          create: (_) => PostChangeNotifier(), child: Home()),
     );
   }
 }
@@ -20,9 +21,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final postService = PostService();
-  Future<Post> postFuture;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,28 +31,42 @@ class _HomeState extends State<Home> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            FutureBuilder<Post>(
-              future: postFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            Consumer<PostChangeNotifier>(
+              builder: (context, notifier, __) {
+                if (notifier.state == NotifierState.initial)
+                  return StyledText('Presee this button');
+                else if (notifier.state == NotifierState.loading)
                   return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  final error = snapshot.error;
-                  return StyledText(error.toString());
-                } else if (snapshot.hasData) {
-                  final post = snapshot.data;
-                  return StyledText(post.toString());
-                } else {
-                  return StyledText('Press the button 👇');
+                else {
+                  if (notifier.failure != null)
+                    return StyledText(notifier.failure.toString());
+                  else
+                    return StyledText(notifier.post.toString());
                 }
+                //
+                // : FutureBuilder<Post>(
+                // future: postFuture,
+                // builder: (context, snapshot) {
+                // if (snapshot.connectionState == ConnectionState.waiting) {
+                // return CircularProgressIndicator();
+                // } else if (snapshot.hasError) {
+                // final error = snapshot.error;
+                // return StyledText(error.toString());
+                // } else if (snapshot.hasData) {
+                // final post = snapshot.data;
+                // return StyledText(post.toString());
+                // } else {
+                // return StyledText('Press the button 👇');
+                // }
+                // },
+                // )
               },
             ),
             RaisedButton(
               child: Text('Get Post'),
               onPressed: () async {
-                setState(() {
-                  postFuture = postService.getOnePost();
-                });
+                Provider.of<PostChangeNotifier>(context, listen: false)
+                    .getOnePost();
               },
             ),
           ],
