@@ -38,10 +38,8 @@ class _HomeState extends State<Home> {
                 else if (notifier.state == NotifierState.loading)
                   return CircularProgressIndicator();
                 else {
-                  if (notifier.failure != null)
-                    return StyledText(notifier.failure.toString());
-                  else
-                    return StyledText(notifier.post.toString());
+                  return notifier.post.fold((l) => StyledText(l.toString()),
+                      (r) => StyledText(r.toString()));
                 }
                 //
                 // : FutureBuilder<Post>(

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:dartz/dartz.dart';
 
 import 'post_service.dart';
 
@@ -14,28 +15,38 @@ class PostChangeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Post _post;
-  Post get post => _post;
-  void _setPost(Post post) {
+  Either<Failure, Post> _post;
+  Either<Failure, Post> get post => _post;
+  void _setPost(Either<Failure, Post> post) {
     _post = post;
-    notifyListeners();
-  }
-
-  Failure _failure;
-  Failure get failure => _failure;
-  void _setFailure(Failure failure) {
-    _failure = failure;
     notifyListeners();
   }
 
   void getOnePost() async {
     _setState(NotifierState.loading);
-    try {
-      final post = await _postService.getOnePost();
-      _setPost(post);
-    } on Failure catch (f) {
-      _setFailure(f);
-    }
+
+    /// the comment out part was related to change notifier way of implementing error handling
+    // try {
+    //   final post = await _postService.getOnePost();
+    //   _setPost(post);
+    // } on Failure catch (f) {
+    //   _setPost(f);
+    //   _setFailure(f);
+    // }
+    /// the following part implements the either and functional programming way of error handling
+
+    await Task(() => _postService.getOnePost())
+        .attempt()
+        .map((either) => either.leftMap((l) {
+              try {
+                l as Failure;
+              } catch (e) {
+                throw l;
+              }
+            }))
+        .run()
+        .then((value) => _setPost(value));
+
     _setState(NotifierState.loaded);
   }
 }

@@ -12,6 +12,9 @@ class FakeHttpClient {
     // throw HttpException('404');
     //! Invalid JSON (throws FormatException)
     // return 'abcd';
+    /// expection like filesytem exception need not be shown to the user but it is better to directly crash the app in these cases
+    /// this file system exception is also not caught diresctly below in the post service class
+    throw FileSystemException();
     return '{"userId":1,"id":1,"title":"nice title","body":"cool body"}';
   }
 }
