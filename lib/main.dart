@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'error_handling/resocoder/main_error_handling.dart';
 import 'rx_dart/mtechviral/main_for_rxdart.dart';
 
-import 'bloc_pattern/flutter_architecture/src/app.dart';
+// import 'bloc_pattern/flutter_architecture/src/app.dart';
+import 'bloc_pattern/bloc_preference/main_bloc_preference.dart';
 
 void main() {
   //runApp(ErrorHandlingResoCoder());

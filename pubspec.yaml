@@ -27,6 +27,8 @@ dependencies:
   dartz: ^0.9.0-dev.5
   rxdart:
   http:
+  connectivity:
+  shared_preferences:
 
 
   # The following adds the Cupertino Icons font to your application.
